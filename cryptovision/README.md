@@ -37,7 +37,8 @@ cryptovision/
 │   │   ├── indicators.py  SMA/RSI/MACD/Bollinger math
 │   │   ├── lstm_model.py  the LSTM prediction model
 │   │   └── routers/       one file per API resource (auth, coins, trade, ...)
-│   └── requirements.txt
+│   ├── requirements.txt
+│   └── requirements-ml.txt  optional: real PyTorch LSTM
 ├── frontend/               React app (Vite)
 │   └── src/
 │       ├── pages/          Login, Register, Dashboard, Trade, Watchlist
@@ -50,18 +51,24 @@ cryptovision/
 
 **Backend:**
 ```bash
-cd backend
-python3 -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
+cd cryptovision/backend
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 cp .env.example .env
 uvicorn app.main:app --reload
+```
+
+Optional -- enables the real PyTorch LSTM instead of the linear-trend fallback
+(~530 MB, CPU-only build):
+```bash
+pip install -r requirements-ml.txt --index-url https://download.pytorch.org/whl/cpu
 ```
 Backend runs at `http://localhost:8000`. Interactive API docs at `http://localhost:8000/docs`.
 
 **Frontend** (separate terminal):
 ```bash
-cd frontend
+cd cryptovision/frontend
 npm install
 cp .env.example .env
 npm run dev
