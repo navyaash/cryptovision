@@ -1,0 +1,10 @@
+# Optional: enables the real PyTorch LSTM in app/lstm_model.py.
+#
+# Deliberately NOT in requirements.txt. Torch is ~530 MB installed, which does
+# not fit Render's 512 MB free tier -- deploys there would OOM. Without it the
+# /predict endpoint falls back to a linear trend estimate and reports
+# "method": "trend_fallback", so nothing breaks.
+#
+# Local install (CPU-only build is much smaller than the default CUDA one):
+#   pip install -r requirements-ml.txt --index-url https://download.pytorch.org/whl/cpu
+torch>=2.2.0

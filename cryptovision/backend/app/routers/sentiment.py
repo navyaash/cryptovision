@@ -1,3 +1,4 @@
+import os
 import requests
 from fastapi import APIRouter, HTTPException
 
@@ -26,12 +27,23 @@ def fear_greed_index():
 @router.get("/news")
 def latest_news(limit: int = 8):
     """Recent crypto news headlines, from CryptoCompare's free news feed."""
+    # CryptoCompare made this feed key-only in 2025. Without a key the request
+    # 401s, so we return an empty list instead of a 502 -- the dashboard then
+    # shows "No news available" rather than spinning on "Loading news..." forever.
+    # Set CRYPTOCOMPARE_API_KEY (free tier at cryptocompare.com) to re-enable it.
+    api_key = os.getenv("CRYPTOCOMPARE_API_KEY", "").strip()
+    params = {"lang": "EN"}
+    if api_key:
+        params["api_key"] = api_key
+
     try:
         resp = requests.get(
             "https://min-api.cryptocompare.com/data/v2/news/",
-            params={"lang": "EN"},
+            params=params,
             timeout=10,
         )
+        if resp.status_code == 401:
+            return []
         resp.raise_for_status()
         articles = resp.json().get("Data", [])[:limit]
         return [
@@ -43,5 +55,6 @@ def latest_news(limit: int = 8):
             }
             for a in articles
         ]
-    except Exception as e:
-        raise HTTPException(status_code=502, detail=f"News API failed: {e}")
+    except Exception:
+        # Never let a flaky third-party news feed break the dashboard.
+        return []

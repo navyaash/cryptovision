@@ -59,8 +59,10 @@ export default function SentimentWidget({ fearGreed, news }) {
               </a>
             ))}
           </div>
-        ) : (
+        ) : news === null ? (
           <div className="loading-state">Loading news...</div>
+        ) : (
+          <div className="loading-state">No news available.</div>
         )}
       </div>
     </div>
